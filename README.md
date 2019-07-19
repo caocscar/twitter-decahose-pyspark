@@ -17,7 +17,7 @@ The interactive shell is analogous to a python console. The following command st
 `pyspark --master yarn --queue workshop`
 
 The following line adds some custom settings.  The 'XXXX' should be a number between 4050 and 4099.  
-`pyspark --master yarn --queue workshop --num-executors 900 --executor-memory 5g --executor-cores 4 --conf spark.ui.port=XXXX`
+`pyspark --master yarn --queue workshop --num-executors 500 --executor-memory 5g --conf spark.ui.port=XXXX`
 
 **Note:** You might get a warning message that looks like `WARN Utils: Service 'SparkUI' could not bind on port 40XX. Attempting port 40YY.` This usually resolves itself after a few seconds. If not, try again at a later time.
 
