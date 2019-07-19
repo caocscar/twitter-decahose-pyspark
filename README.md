@@ -50,9 +50,11 @@ This reads the JSONLINES data into a PySpark DataFrame. We can see the structure
 
 `df.printSchema()`
 
-The schema shows the top level keys as columns of the dataframe. Any nested data is squashed into arrays of values (no keys included).
+The schema shows the "root-level" attributes as columns of the dataframe. Any nested data is squashed into arrays of values (no keys included).
 
-**Reference**: PySpark JSON Files Guide https://spark.apache.org/docs/latest/sql-data-sources-json.html
+#### Reference
+ PySpark JSON Files Guide https://spark.apache.org/docs/latest/sql-data-sources-json.html
+ Twitter Tweet Objects https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/tweet-object.html
 
 ## Selecting Data
 For example, if we wanted to see what the tweet text is and when it was created, we could do the following.
