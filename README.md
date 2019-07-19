@@ -36,10 +36,11 @@ spark
 ## Exit Interactive Shell
 Type `exit()` or press Ctrl-D
 
+## Example Code
 ```
 import os
 wdir = '/var/twitter/decahose/raw'
-df = sqlContext.read.json(os.path.join(wdir,'decahose.2018-03-02.p1.bz2'))
+df = sqlContext.read.json(os.path.join(wdir,'decahose.2018-03-02.p2.bz2'))
 
 df.printSchema()
 ```
@@ -50,56 +51,40 @@ PySpark JSON Files Guide
 https://spark.apache.org/docs/latest/sql-data-sources-json.html
 
 ```
+from pyspark.sql.functions import explode
+
 abc = df.select('user')
 abc.show(1, truncate=False)
+abc.printSchema()
 
-from pyspark.sql.functions import udf, explode, array
-from pyspark.sql.types import Row
+fgh = df.select('user.*') # selects all child of userfgh.colum
+fgh.printSchema()
 
-get_date = udf(lambda x: x[1], 'string')
-newdf = abc.withColumn('date', get_date('user'))
-newdf.show(5)
+ijk = df.select('user.created_at','user.name','user.screen_name')
+ijk.printSchema()
+ijk.show(5)
+ijk
 
-user_description = udf(lambda x: x[4], 'string')
-newdf = abc.withColumn('other', user_description('user'))
-newdf.show(5)
+aa = df.select('entities.user_mentions.name')
+aa.printSchema()
+aa.show(5)
 
-get_column = udf(lambda x: x[17], 'string')
-getc = udf(lambda x: x[10], 'string')
-newdf = abc.withColumn('other', get_column('user')).withColumn('geo', getc('user'))
-newdf.show(10)
+bb = df.select(explode('entities.user_mentions.name'))
+bb.printSchema()
+bb.show(5)
 
-get_column = udf(lambda x: [x[17], x[10] 'string')
-getc = udf(lambda x: x[10], 'string')
-newdf = abc.withColumn('other', get_column('user')).withColumn('geo', getc('user'))
-newdf.show(10)
+bb = df.select(explode('entities.user_mentions.name'), explode('entities.user_mentions.screen_name')
+'Only one generator allowed per select clause but found 2:'
 
-def extract(x):
-  return [x[17], x[10]]
-
-schema = StructType([
-    StructField("Out1", StringType(), True),
-    StructField("Out2", StringType(), True)])
-
-get_column = udf(extract)
-newdf = abc.withColumn('other', array(get_column('user')))
-newdf.show(10)
-
+cc = df.select(explode('entities.user_mentions').alias('user_mentions'))
+cc.printSchema()
+dd = cc.select('user_mentions.*')
+dd.show(5)
 ```
-user list index|column
----|---
-1|created_at
-4|description
-5|favourites_count
-7|followers_count
-9|friends_count
-10|geo_enabled
-11|id
-12|id_str
-14|lang
-15|listed_count
-16|location
-17|name
-32|screen_name
-33|statuses_count
+Suppose I wanted a four column dataframe.
+In Python, I would access the JSON file as follows and save into a tuple:
+`(tweet['created_at'], tweet['user']['name'], tweet['user']['screen_name'], tweet['text'])`
+
+In PySpark
+`df.select('created_at','user.name','user.screen_name','text')`
 
