@@ -35,3 +35,71 @@ spark
 
 ## Exit Interactive Shell
 Type `exit()` or press Ctrl-D
+
+```
+import os
+wdir = '/var/twitter/decahose/raw'
+df = sqlContext.read.json(os.path.join(wdir,'decahose.2018-03-02.p1.bz2'))
+
+df.printSchema()
+```
+Assumes the json file is in jsonlines format (decahose data is in this format).
+The schema shows that `.read.json` puts the top level keys into columns of the dataframe. Any nested json is put into an array of values (no keys included).
+
+PySpark JSON Files Guide
+https://spark.apache.org/docs/latest/sql-data-sources-json.html
+
+```
+abc = df.select('user')
+abc.show(1, truncate=False)
+
+from pyspark.sql.functions import udf, explode, array
+from pyspark.sql.types import Row
+
+get_date = udf(lambda x: x[1], 'string')
+newdf = abc.withColumn('date', get_date('user'))
+newdf.show(5)
+
+user_description = udf(lambda x: x[4], 'string')
+newdf = abc.withColumn('other', user_description('user'))
+newdf.show(5)
+
+get_column = udf(lambda x: x[17], 'string')
+getc = udf(lambda x: x[10], 'string')
+newdf = abc.withColumn('other', get_column('user')).withColumn('geo', getc('user'))
+newdf.show(10)
+
+get_column = udf(lambda x: [x[17], x[10] 'string')
+getc = udf(lambda x: x[10], 'string')
+newdf = abc.withColumn('other', get_column('user')).withColumn('geo', getc('user'))
+newdf.show(10)
+
+def extract(x):
+  return [x[17], x[10]]
+
+schema = StructType([
+    StructField("Out1", StringType(), True),
+    StructField("Out2", StringType(), True)])
+
+get_column = udf(extract)
+newdf = abc.withColumn('other', array(get_column('user')))
+newdf.show(10)
+
+```
+user list index|column
+---|---
+1|created_at
+4|description
+5|favourites_count
+7|followers_count
+9|friends_count
+10|geo_enabled
+11|id
+12|id_str
+14|lang
+15|listed_count
+16|location
+17|name
+32|screen_name
+33|statuses_count
+
