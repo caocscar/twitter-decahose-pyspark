@@ -1,5 +1,5 @@
 # Using Twitter Decahose with Cavium
-Twitter data already resides on a directory on Cavium. Log in to Cavium to get started.
+Twitter data already resides in a directory on Cavium. Log in to Cavium to get started.
 
 ## UM Hadoop Cavium Cluster
 SSH to `cavium-thunderx.arc-ts.umich.edu` `Port 22` using a SSH client (e.g. PuTTY on Windows) and login using your Cavium account and two-factor authentication.
@@ -138,10 +138,11 @@ import os
 from pyspark.sql.functions import explode
 
 wdir = '/var/twitter/decahose/raw'
-df = sqlContext.read.json(os.path.join(wdir,'decahose.2018-03-02.p2.bz2'))
-df.select('created_at','user.name','user.screen_name','text')
+file = 'decahose.2018-03-02.p2.bz2'
+df = sqlContext.read.json(os.path.join(wdir,file))
+four = df.select('created_at','user.name','user.screen_name','text')
 folder = 'twitterDemo'
-df.write.mode('append').parquet(folder)
+four.write.mode('overwrite').parquet(folder)
 ```
 
 
