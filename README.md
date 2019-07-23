@@ -120,6 +120,19 @@ mentions2 = mentions.select('user_mentions.name','user_mentions.screen_name')
 mentions2.show(5)
 ```
 
+### Getting Nested Data II
+What if we wanted to get at data in a list? Like the indices in `user_mentions`.
+```
+idx = mentions.select('user_mentions.indices')
+idx.printSchema()
+idx.show(5)
+```
+The schema shows that the data is in an `array` type. For some reason, `explode` will put each element in its own row. Instead, we can use the `withColumn` method to index the list elements.
+```
+idx2 = idx.withColumn('first', idx['indices'][0]).withColumn('second', idx['indices'][1])
+```
+Why the difference?  Because the underlying element is not a `struct` data type but a `long` instead.
+
 ## Summary
 So if you access JSON data in Python like this:
 
