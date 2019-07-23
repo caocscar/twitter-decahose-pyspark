@@ -170,7 +170,7 @@ df = sqlContext.read.parquet(folder)
 
 `contains` method
 ```
-food = df.filter(df.text.contains(' food'))
+food = df.filter(df['text'].contains(' food'))
 food = food.select('text')
 food.show(10, truncate=False)
 ```
@@ -184,7 +184,7 @@ once.show(10, truncate=False)
 
 `endswith` method
 ```
-ming = df.filter(df.text.endswith('ming'))
+ming = df.filter(df['text'].endswith('ming'))
 ming = ming.select('text')
 ming.show(10, truncate=False)
 ```
@@ -198,7 +198,7 @@ mom.show(10, truncate=False)
 
 regular expressions
 ```
-regex = df.filter(df.text.rlike('[i ]king'))
+regex = df.filter(df['text'].rlike('[i ]king'))
 regex = regex.select('text')
 regex.show(10, truncate=False)
 ```
