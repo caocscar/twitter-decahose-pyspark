@@ -9,8 +9,10 @@ SSH to `cavium-thunderx.arc-ts.umich.edu` `Port 22` using a SSH client (e.g. PuT
 ### Setting Python Version 
 Change Python version for PySpark to Python 3.X (instead of default Python 2.7) 
 
-`export PYSPARK_PYTHON=/bin/python3`  
-`export PYSPARK_DRIVER_PYTHON=/bin/python3`
+```
+export PYSPARK_PYTHON=/bin/python3  
+export PYSPARK_DRIVER_PYTHON=/bin/python3
+```
 
 ## PySpark Interactive Shell
 The interactive shell is analogous to a python console. The following command starts up the interactive shell for PySpark with default settings in the `workshop` queue.  
@@ -167,6 +169,14 @@ Read in parquet file.
 folder = 'twitterDemo'
 df = sqlContext.read.parquet(folder)
 ```
+Below are several ways to match text
+---
+
+Exact match `==`
+```
+hello = df.filter(df.text == 'hello world')
+hello.show(10)
+```
 
 `contains` method
 ```
@@ -211,3 +221,21 @@ resta.show(10, truncate=False)
 ```
 
 **Reference**: http://spark.apache.org/docs/latest/api/python/pyspark.sql.html#pyspark.sql.Column
+
+## Using Jupyter Notebook with PySpark
+Currently, the Cavium configuration only supports Python 2.7 on Jupyter.
+
+1. Open a command prompt/terminal in Windows/Mac. You should have putty in your PATH (for Windows).
+`putty.exe -ssh -L localhost:8889:localhost:8889 cavium-thunderx.arc-ts.umich.edu` (Windows)  
+`ssh -L localhost:8889:localhost:8889 cavium-thunderx.arc-ts.umich.edu` (Mac/Linux)
+2. This should open another ssh client for Cavium. Log in as normal.
+3. From the Cavium terminal, type the following (replace XXXX with number between 4050 and 4099):
+```
+export PYSPARK_PYTHON=/bin/python3  # not functional code
+export PYSPARK_DRIVER_PYTHON=jupyter  
+export PYSPARK_DRIVER_PYTHON_OPTS='notebook --no-browser --port=8889'  
+pyspark --master yarn --queue workshop --num-executors 500 --executor-memory 5g --conf spark.ui.port=XXXX
+```
+4. Copy/paste the URL (from your terminal where you launched jupyter notebook) into your browser. The URL should look something like this but with a different token.
+http://localhost:8889/?token=745f8234f6d0cf3b362404ba32ec7026cb6e5ea7cc960856
+5. You should be connected.
