@@ -209,3 +209,5 @@ resta = df.filter(df.text.contains('resta') & df.text.endswith('ing'))
 resta = resta.select('text')
 resta.show(10, truncate=False)
 ```
+
+**Reference**: http://spark.apache.org/docs/latest/api/python/pyspark.sql.html#pyspark.sql.Column
