@@ -161,4 +161,51 @@ folder = 'twitterDemo'
 four.write.mode('overwrite').parquet(folder)
 ```
 
+## Example: Finding text in a Tweet
+Read in parquet file.
+```
+folder = 'twitterDemo'
+df = sqlContext.read.parquet(folder)
+```
 
+`contains` method
+```
+food = df.filter(df.text.contains(' food'))
+food = food.select('text')
+food.show(10, truncate=False)
+```
+
+`startswith` method
+```
+once = df.filter(df.text.startswith('Once'))
+once = once.select('text')
+once.show(10, truncate=False)
+```
+
+`endswith` method
+```
+ming = df.filter(df.text.endswith('ming'))
+ming = ming.select('text')
+ming.show(10, truncate=False)
+```
+
+`like` method using SQL wildcards
+```
+mom = df.filter(df.text.like('%mom%'))
+mom = mom.select('text')
+mom.show(10, truncate=False)
+```
+
+regular expressions
+```
+regex = df.filter(df.text.rlike('[i ]king'))
+regex = regex.select('text')
+regex.show(10, truncate=False)
+```
+
+Using more than one condition (`&|~`)
+```
+resta = df.filter(df.text.contains('resta') & df.text.endswith('ing'))
+resta = resta.select('text')
+resta.show(10, truncate=False)
+```
