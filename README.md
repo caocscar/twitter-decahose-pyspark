@@ -213,7 +213,10 @@ regex = regex.select('text')
 regex.show(10, truncate=False)
 ```
 
-Using more than one condition (`&|~`)
+Applying more than one condition. When building DataFrame boolean expressions, use
+- `&` for `and`
+- `|` for `or`
+- `~` for `not`  
 ```
 resta = df.filter(df.text.contains('resta') & df.text.endswith('ing'))
 resta = resta.select('text')
@@ -225,7 +228,7 @@ resta.show(10, truncate=False)
 ## Using Jupyter Notebook with PySpark
 Currently, the Cavium configuration only supports Python 2.7 on Jupyter.
 
-1. Open a command prompt/terminal in Windows/Mac. You should have putty in your PATH (for Windows).  
+1. Open a command prompt/terminal in Windows/Mac. You should have putty in your PATH (for Windows).  Port 8889 is arbitrarily chosen.  
 `putty.exe -ssh -L localhost:8889:localhost:8889 cavium-thunderx.arc-ts.umich.edu` (Windows)  
 `ssh -L localhost:8889:localhost:8889 cavium-thunderx.arc-ts.umich.edu` (Mac/Linux)
 2. This should open another ssh client for Cavium. Log in as normal.
