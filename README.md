@@ -1,7 +1,24 @@
-# Using Twitter Decahose with Cavium
+# Using Twitter Decahose with Cavium <!-- omit in toc -->
+
+## Table of Contents
+  - [UM Hadoop Cavium Cluster](#um-hadoop-cavium-cluster)
+    - [Setting Python Version](#setting-python-version)
+  - [PySpark Interactive Shell](#pyspark-interactive-shell)
+    - [Exit Interactive Shell](#exit-interactive-shell)
+  - [Using Jupyter Notebook with PySpark](#using-jupyter-notebook-with-pyspark)
+- [Example Code](#example-code)
+  - [Read in twitter file](#read-in-twitter-file)
+  - [Selecting Data](#selecting-data)
+    - [Getting Nested Data](#getting-nested-data)
+    - [Getting Nested Data II](#getting-nested-data-ii)
+  - [Summary](#summary)
+  - [Saving Data](#saving-data)
+  - [Complete Script](#complete-script)
+  - [Example: Finding text in a Tweet](#example-finding-text-in-a-tweet)
+ 
+## UM Hadoop Cavium Cluster
 Twitter data already resides in a directory on Cavium. Log in to Cavium to get started.
 
-## UM Hadoop Cavium Cluster
 SSH to `cavium-thunderx.arc-ts.umich.edu` `Port 22` using a SSH client (e.g. PuTTY on Windows) and login using your Cavium account and two-factor authentication.
 
 **Note:** ARC-TS has a [Getting Started with Hadoop User Guide](http://arc-ts.umich.edu/new-hadoop-user-guide/)
@@ -35,8 +52,26 @@ sqlContext
 spark
 ```
 
-## Exit Interactive Shell
+### Exit Interactive Shell
 Type `exit()` or press Ctrl-D
+
+## Using Jupyter Notebook with PySpark
+Currently, the Cavium configuration only supports Python 2.7 on Jupyter.
+
+1. Open a command prompt/terminal in Windows/Mac. You should have putty in your PATH (for Windows).  Port 8889 is arbitrarily chosen.  
+`putty.exe -ssh -L localhost:8889:localhost:8889 cavium-thunderx.arc-ts.umich.edu` (Windows)  
+`ssh -L localhost:8889:localhost:8889 cavium-thunderx.arc-ts.umich.edu` (Mac/Linux)
+2. This should open a ssh client for Cavium. Log in as usual.
+3. From the Cavium terminal, type the following (replace XXXX with number between 4050 and 4099):
+```
+export PYSPARK_PYTHON=/bin/python3  # not functional code
+export PYSPARK_DRIVER_PYTHON=jupyter  
+export PYSPARK_DRIVER_PYTHON_OPTS='notebook --no-browser --port=8889'  
+pyspark --master yarn --queue workshop --num-executors 500 --executor-memory 5g --conf spark.ui.port=XXXX
+```
+4. Copy/paste the URL (from your terminal where you launched jupyter notebook) into your browser. The URL should look something like this but with a different token.
+http://localhost:8889/?token=745f8234f6d0cf3b362404ba32ec7026cb6e5ea7cc960856
+5. You should be connected.
 
 # Example Code
 Generic PySpark data wrangling commands can be found at https://github.com/caocscar/workshops/blob/master/pyspark/pyspark.md
@@ -54,7 +89,7 @@ This reads the JSONLINES data into a PySpark DataFrame. We can see the structure
 
 The schema shows the "root-level" attributes as columns of the dataframe. Any nested data is squashed into arrays of values (no keys included).
 
-#### Reference
+**Reference**
  - PySpark JSON Files Guide https://spark.apache.org/docs/latest/sql-data-sources-json.html
 
  - Twitter Tweet Objects https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/tweet-object.html
@@ -75,8 +110,8 @@ What if we wanted to get at data that was nested? Like in `user`.
 
 ```
 user = df.select('user')
-abc.printSchema()
-abc.show(1, truncate=False)
+user.printSchema()
+user.show(1, truncate=False)
 ```
 This returns a single column `user` with the nested data in a list (technically a `struct`).
 
@@ -132,6 +167,7 @@ idx.show(5)
 The schema shows that the data is in an `array` type. For some reason, `explode` will put each element in its own row. Instead, we can use the `withColumn` method to index the list elements.
 ```
 idx2 = idx.withColumn('first', idx['indices'][0]).withColumn('second', idx['indices'][1])
+idx2.show(5)
 ```
 Why the difference?  Because the underlying element is not a `struct` data type but a `long` instead.
 
@@ -163,14 +199,14 @@ folder = 'twitterDemo'
 four.write.mode('overwrite').parquet(folder)
 ```
 
-## Example: Finding text in a Tweet
+## Example: Finding text in a Tweet 
 Read in parquet file.
 ```
 folder = 'twitterDemo'
 df = sqlContext.read.parquet(folder)
 ```
-Below are several ways to match text
----
+Below are several ways to match text 
+***
 
 Exact match `==`
 ```
@@ -208,7 +244,7 @@ mom.show(10, truncate=False)
 
 regular expressions ([workshop material](https://github.com/caocscar/workshops/tree/master/regex))
 ```
-regex = df.filter(df['text'].rlike('[i ]king'))
+regex = df.filter(df['text'].rlike('[ia ]king'))
 regex = regex.select('text')
 regex.show(10, truncate=False)
 ```
@@ -224,21 +260,3 @@ resta.show(10, truncate=False)
 ```
 
 **Reference**: http://spark.apache.org/docs/latest/api/python/pyspark.sql.html#pyspark.sql.Column
-
-## Using Jupyter Notebook with PySpark
-Currently, the Cavium configuration only supports Python 2.7 on Jupyter.
-
-1. Open a command prompt/terminal in Windows/Mac. You should have putty in your PATH (for Windows).  Port 8889 is arbitrarily chosen.  
-`putty.exe -ssh -L localhost:8889:localhost:8889 cavium-thunderx.arc-ts.umich.edu` (Windows)  
-`ssh -L localhost:8889:localhost:8889 cavium-thunderx.arc-ts.umich.edu` (Mac/Linux)
-2. This should open a ssh client for Cavium. Log in as usual.
-3. From the Cavium terminal, type the following (replace XXXX with number between 4050 and 4099):
-```
-export PYSPARK_PYTHON=/bin/python3  # not functional code
-export PYSPARK_DRIVER_PYTHON=jupyter  
-export PYSPARK_DRIVER_PYTHON_OPTS='notebook --no-browser --port=8889'  
-pyspark --master yarn --queue workshop --num-executors 500 --executor-memory 5g --conf spark.ui.port=XXXX
-```
-4. Copy/paste the URL (from your terminal where you launched jupyter notebook) into your browser. The URL should look something like this but with a different token.
-http://localhost:8889/?token=745f8234f6d0cf3b362404ba32ec7026cb6e5ea7cc960856
-5. You should be connected.
