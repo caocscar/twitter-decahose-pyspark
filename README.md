@@ -1,6 +1,8 @@
 # Using Twitter Decahose with Cavium <!-- omit in toc -->
 
-## Table of Contents
+Go directly to Jupyter Notebook viewer version https://nbviewer.jupyter.org/github/caocscar/twitter-decahose-pyspark/blob/master/twitterCavium.ipynb
+
+## Table of Contents <!-- omit in toc -->
   - [UM Hadoop Cavium Cluster](#um-hadoop-cavium-cluster)
     - [Setting Python Version](#setting-python-version)
   - [PySpark Interactive Shell](#pyspark-interactive-shell)
