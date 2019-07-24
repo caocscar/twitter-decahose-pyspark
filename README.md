@@ -201,12 +201,12 @@ ming.show(10, truncate=False)
 
 `like` method using SQL wildcards
 ```
-mom = df.filter(df.text.like('%mom%'))
+mom = df.filter(df.text.like('%mom_'))
 mom = mom.select('text')
 mom.show(10, truncate=False)
 ```
 
-regular expressions
+regular expressions ([workshop material](https://github.com/caocscar/workshops/tree/master/regex))
 ```
 regex = df.filter(df['text'].rlike('[i ]king'))
 regex = regex.select('text')
@@ -231,7 +231,7 @@ Currently, the Cavium configuration only supports Python 2.7 on Jupyter.
 1. Open a command prompt/terminal in Windows/Mac. You should have putty in your PATH (for Windows).  Port 8889 is arbitrarily chosen.  
 `putty.exe -ssh -L localhost:8889:localhost:8889 cavium-thunderx.arc-ts.umich.edu` (Windows)  
 `ssh -L localhost:8889:localhost:8889 cavium-thunderx.arc-ts.umich.edu` (Mac/Linux)
-2. This should open another ssh client for Cavium. Log in as normal.
+2. This should open a ssh client for Cavium. Log in as usual.
 3. From the Cavium terminal, type the following (replace XXXX with number between 4050 and 4099):
 ```
 export PYSPARK_PYTHON=/bin/python3  # not functional code
