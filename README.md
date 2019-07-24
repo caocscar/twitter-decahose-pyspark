@@ -18,6 +18,15 @@ Go directly to Jupyter Notebook viewer version
   - [Saving Data](#saving-data)
   - [Complete Script](#complete-script)
 - [Example: Finding text in a Tweet](#example-finding-text-in-a-tweet)
+- [Example: Filtering Tweets by Location](#example-filtering-tweets-by-location)
+  - [Coordinates](#coordinates)
+  - [Place](#place)
+  - [Place Types](#place-types)
+    - [Country](#country)
+    - [Admin (US examples)](#admin-us-examples)
+    - [City](#city)
+    - [Neighborhood (US examples)](#neighborhood-us-examples)
+    - [POI (US examples)](#poi-us-examples)
 
 ## UM Hadoop Cavium Cluster
 Twitter data already resides in a directory on Cavium. Log in to Cavium to get started.
@@ -192,14 +201,13 @@ df.write.mode('append').parquet(folder)
 Here is a sample script which combines everything we just covered. It extracts a four column DataFrame.
 ```
 import os
-from pyspark.sql.functions import explode
 
 wdir = '/var/twitter/decahose/raw'
 file = 'decahose.2018-03-02.p2.bz2'
 df = sqlContext.read.json(os.path.join(wdir,file))
-four = df.select('created_at','user.name','user.screen_name','text')
-folder = 'twitterDemo'
-four.write.mode('overwrite').parquet(folder)
+six = df.select('created_at','user.name','user.screen_name','text','coordinates','place')
+folder = 'twitterExtract'
+six.write.mode('overwrite').parquet(folder)
 ```
 
 ## Example: Finding text in a Tweet 
@@ -263,3 +271,158 @@ resta.show(10, truncate=False)
 ```
 
 **Reference**: http://spark.apache.org/docs/latest/api/python/pyspark.sql.html#pyspark.sql.Column
+
+## Example: Filtering Tweets by Location
+
+Read in parquet file.
+```
+folder = 'twitterDemo'
+df = sqlContext.read.parquet(folder)
+```
+From the [Twitter Geo-Objects documentation](https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/geo-objects):
+
+> There are two "root-level" JSON objects used to  describe the location associated with a Tweet: `coordinates` and `place`.
+
+> The `place` object is always present when a Tweet is geo-tagged, while the `coordinates` object is only present (non-null) when the Tweet is assigned an exact location. If an exact location is provided, the `coordinates` object will provide a [long, lat] array with the geographical coordinates, and a Twitter Place that corresponds to that location will be assigned.
+
+### Coordinates
+Select Tweets that have gps coordinates
+```
+coords = df.filter(df['coordinates'].isNotNull())
+```
+
+Construct a longitude and latitude column
+```
+coords = coords.withColumn('lng', coords['coordinates.coordinates'][0])
+coords = coords.withColumn('lat', coords['coordinates.coordinates'][1])
+coords.printSchema()
+coords.show(5, truncate=False)
+```
+
+Apply a bounding box to tweets and count number of matching tweets
+```
+A2 = coords.filter(coords['lng'].between(-84,-83) & coords['lat'].between(42,43))
+A2.show(5, truncate=False)
+A2.count()
+```
+**Done!**
+
+### Place
+Search for places by name 
+
+Create separate columns from `place` object
+```
+place = df.filter(df['place'].isNotNull())
+place = place.select('place.country', 'place.country_code', 'place.place_type','place.name', 'place.full_name')
+place.printSchema()
+place.show(10, truncate=False)
+```
+
+Apply place filter
+```
+MI = place.filter(place['full_name'].contains(' MI'))
+MI.show(10, truncate=False)
+MI.count()
+```
+**Tip**: Refer to section ["Finding text in a Tweet"](#example-finding-text-in-a-tweet) for other search methods
+
+### Place Types
+There are five kinds of `place_type` in the twitter dataset in approximately descending geographic area:
+1. country
+2. admin
+3. city
+4. neighborhood
+5. poi (point of interest)
+
+Here's a breakdown of the relative frequency for this dataset
+```
+place.registerTempTable('Places')
+place_type_ct = sqlContext.sql('SELECT place_type, COUNT(*) as ct FROM Places GROUP BY place_type ORDER BY ct DESC')
+place_type_ct.show()
+```
+|place_type|ct|
+|:---:|---:|
+|city|1738893|
+|admin|221170|
+|country|79811|
+|poi|24701|
+|neighborhood|3343|
+
+Here are some examples of each `place_type`:
+#### Country
+```
+country = sqlContext.sql("SELECT * FROM Places WHERE place_type = 'country'")
+country.show(5, truncate=False)
+```
+|country|country_code|place_type|name|full_name|
+|---|:---:|:---:|---|---|
+|Uzbekistan|UZ|country|Uzbekistan|Uzbekistan|
+|Bosnia and Herzegovina|BA|country|Bosnia and Herzegovina|Bosnia and Herzegovina|
+|United States|US|country|United States|United States|
+|Ukraine|UA|country|Ukraine|Ukraine|
+|República de Moçambique|MZ|country|República de Moçambique|República de Moçambique|
+
+#### Admin (US examples)
+```
+admin = sqlContext.sql("SELECT * FROM Places WHERE place_type = 'admin' AND country_code = 'US'")
+admin.show(10, truncate=False)
+```
+|country|country_code|place_type|name|full_name|
+|---|:---:|:---:|---|---|
+|United States|US|admin|Louisiana|Louisiana, USA|
+|United States|US|admin|New York|New York, USA|
+|United States|US|admin|California|California, USA|
+|United States|US|admin|Michigan|Michigan, USA|
+|United States|US|admin|South Carolina|South Carolina, USA|
+|United States|US|admin|Virginia|Virginia, USA|
+|United States|US|admin|South Dakota|South Dakota, USA|
+|United States|US|admin|Louisiana|Louisiana, USA|
+|United States|US|admin|Florida|Florida, USA|
+|United States|US|admin|Indiana|Indiana, USA|
+
+#### City
+```
+city = sqlContext.sql("SELECT * FROM Places WHERE place_type = 'city'")
+city.show(5, truncate=False)
+```
+|country|country_code|place_type|name|full_name|
+|---|:---:|:---:|---|---|
+|Portugal|PT|city|Barcelos|Barcelos, Portugal|
+|Brasil|BR|city|São Luís|São Luís, Brasil|
+|Malaysia|MY|city|Petaling Jaya|Petaling Jaya, Selangor|
+|Germany|DE|city|Illmensee|Illmensee, Deutschland|
+|Ireland|IE|city|Kildare|Kildare, Ireland|
+#### Neighborhood (US examples)
+```
+neighborhood = sqlContext.sql("SELECT * FROM Places WHERE place_type = 'neighborhood' AND country_code = 'US'")
+neighborhood.show(10, truncate=False)
+```
+|country|country_code|place_type|name|full_name|
+|---|:---:|:---:|---|---|
+|United States|US|neighborhood|Duboce Triangle|Duboce Triangle, San Francisco|
+|United States|US|neighborhood|Downtown|Downtown, Houston|
+|United States|US|neighborhood|South Los Angeles|South Los Angeles, Los Angeles|
+|United States|US|neighborhood|Cabbagetown|Cabbagetown, Atlanta|
+|United States|US|neighborhood|Downtown|Downtown, Memphis|
+|United States|US|neighborhood|Downtown|Downtown, Houston|
+|United States|US|neighborhood|Hollywood|Hollywood, Los Angeles|
+|United States|US|neighborhood|Clinton|Clinton, Manhattan|
+|United States|US|neighborhood|Noe Valley|Noe Valley, San Francisco|
+|United States|US|neighborhood|The Las Vegas Strip|The Las Vegas Strip, Paradise|
+#### POI (US examples)
+```
+poi = sqlContext.sql("SELECT * FROM Places WHERE place_type = 'poi' AND country_code = 'US'")
+poi.show(10, truncate=False)
+```
+|country|country_code|place_type|name|full_name|
+|---|:---:|:---:|---|---|
+|United States|US|poi|Bice Cucina Miami|Bice Cucina Miami|
+|United States|US|poi|Ala Moana Beach Park|Ala Moana Beach Park|
+|United States|US|poi|Los Angeles Convention Center|Los Angeles Convention Center|
+|United States|US|poi|Cleveland Hopkins International Airport (CLE)|Cleveland Hopkins International Airport (CLE)|
+|United States|US|poi|Indianapolis Marriott Downtown|Indianapolis Marriott Downtown|
+|United States|US|poi|Round 1 - Coronado Center|Round 1 - Coronado Center|
+|United States|US|poi|Golds Gym - Lake Mead|Golds Gym - Lake Mead|
+|United States|US|poi|Lower Keys Medical Center|Lower Keys Medical Center|
+|United States|US|poi|Mockingbird Vista|Mockingbird Vista|
+|United States|US|poi|Starbucks|Starbucks|
