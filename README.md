@@ -4,12 +4,12 @@ Go directly to Jupyter Notebook viewer version
  https://nbviewer.jupyter.org/github/caocscar/twitter-decahose-pyspark/blob/master/twitterCavium.ipynb
 
 ## Table of Contents <!-- omit in toc -->
-  - [UM Hadoop Cavium Cluster](#um-hadoop-cavium-cluster)
-    - [Setting Python Version](#setting-python-version)
-  - [PySpark Interactive Shell](#pyspark-interactive-shell)
-    - [Exit Interactive Shell](#exit-interactive-shell)
-  - [Using Jupyter Notebook with PySpark](#using-jupyter-notebook-with-pyspark)
-- [Example Code](#example-code)
+- [UM Hadoop Cavium Cluster](#um-hadoop-cavium-cluster)
+  - [Setting Python Version](#setting-python-version)
+- [PySpark Interactive Shell](#pyspark-interactive-shell)
+  - [Exit Interactive Shell](#exit-interactive-shell)
+- [Using Jupyter Notebook with PySpark](#using-jupyter-notebook-with-pyspark)
+- [Example: Parsing JSON](#example-parsing-json)
   - [Read in twitter file](#read-in-twitter-file)
   - [Selecting Data](#selecting-data)
     - [Getting Nested Data](#getting-nested-data)
@@ -17,8 +17,8 @@ Go directly to Jupyter Notebook viewer version
   - [Summary](#summary)
   - [Saving Data](#saving-data)
   - [Complete Script](#complete-script)
-  - [Example: Finding text in a Tweet](#example-finding-text-in-a-tweet)
- 
+- [Example: Finding text in a Tweet](#example-finding-text-in-a-tweet)
+
 ## UM Hadoop Cavium Cluster
 Twitter data already resides in a directory on Cavium. Log in to Cavium to get started.
 
@@ -76,10 +76,10 @@ pyspark --master yarn --queue workshop --num-executors 500 --executor-memory 5g 
 http://localhost:8889/?token=745f8234f6d0cf3b362404ba32ec7026cb6e5ea7cc960856
 5. You should be connected.
 
-# Example Code
+## Example: Parsing JSON
 Generic PySpark data wrangling commands can be found at https://github.com/caocscar/workshops/blob/master/pyspark/pyspark.md
 
-## Read in twitter file
+### Read in twitter file
 The twitter data is stored in JSONLINES format and compressed using bz2. PySpark has a `sqlContext.read.json` function that can handle this for us (including the decompression).
 ```
 import os
@@ -97,7 +97,7 @@ The schema shows the "root-level" attributes as columns of the dataframe. Any ne
 
  - Twitter Tweet Objects https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/tweet-object.html
 
-## Selecting Data
+### Selecting Data
 For example, if we wanted to see what the tweet text is and when it was created, we could do the following.
 ```
 tweet = df.select('created_at','text')
@@ -108,7 +108,7 @@ The output is truncated by default. We can override this using the truncate argu
 
 `tweet.show(5, truncate=False)`
 
-### Getting Nested Data
+#### Getting Nested Data
 What if we wanted to get at data that was nested? Like in `user`.
 
 ```
@@ -160,7 +160,7 @@ mentions2 = mentions.select('user_mentions.name','user_mentions.screen_name')
 mentions2.show(5)
 ```
 
-### Getting Nested Data II
+#### Getting Nested Data II
 What if we wanted to get at data in a list? Like the indices in `user_mentions`.
 ```
 idx = mentions.select('user_mentions.indices')
@@ -174,7 +174,7 @@ idx2.show(5)
 ```
 Why the difference?  Because the underlying element is not a `struct` data type but a `long` instead.
 
-## Summary
+### Summary
 So if you access JSON data in Python like this:
 
 `(tweet['created_at'], tweet['user']['name'], tweet['user']['screen_name'], tweet['text'])`
@@ -182,13 +182,13 @@ So if you access JSON data in Python like this:
 The equivalent of a PySpark Dataframe would be like this:
 `df.select('created_at','user.name','user.screen_name','text')`
 
-## Saving Data
+### Saving Data
 Once you have constructed your PySpark DataFrame of interest, you should save it (append or overwrite) as a parquet file as so.
 ```
 folder = 'twitterExtract'
 df.write.mode('append').parquet(folder)
 ```
-## Complete Script
+### Complete Script
 Here is a sample script which combines everything we just covered. It extracts a four column DataFrame.
 ```
 import os
