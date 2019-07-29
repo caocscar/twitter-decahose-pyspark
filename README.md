@@ -340,13 +340,13 @@ place.registerTempTable('Places')
 place_type_ct = sqlContext.sql('SELECT place_type, COUNT(*) as ct FROM Places GROUP BY place_type ORDER BY ct DESC')
 place_type_ct.show()
 ```
-|place_type|ct|
-|:---:|---:|
-|city|1738893|
-|admin|221170|
-|country|79811|
-|poi|24701|
-|neighborhood|3343|
+|place_type|count|pct|
+|:---:|---:|---:|
+|city|1738893|84.1%|
+|admin|221170|10.7%|
+|country|79811|3.9%|
+|poi|24701|1.2%|
+|neighborhood|3343|0.2%|
 
 Here are some examples of each `place_type`:
 #### Country
