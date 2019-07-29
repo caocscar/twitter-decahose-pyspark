@@ -189,6 +189,7 @@ So if you access JSON data in Python like this:
 `(tweet['created_at'], tweet['user']['name'], tweet['user']['screen_name'], tweet['text'])`
 
 The equivalent of a PySpark Dataframe would be like this:
+
 `df.select('created_at','user.name','user.screen_name','text')`
 
 ### Saving Data
