@@ -334,7 +334,7 @@ There are five kinds of `place_type` in the twitter dataset in approximately des
 4. neighborhood
 5. poi (point of interest)
 
-Here's a breakdown of the relative frequency for this dataset
+Here's a breakdown of the relative frequency for this dataset (Note: Percentages have been added post-hoc and won't show up in the SQL result)
 ```
 place.registerTempTable('Places')
 place_type_ct = sqlContext.sql('SELECT place_type, COUNT(*) as ct FROM Places GROUP BY place_type ORDER BY ct DESC')
