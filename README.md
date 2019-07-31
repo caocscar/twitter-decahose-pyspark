@@ -70,7 +70,7 @@ Type `exit()` or press Ctrl-D
 ## Using Jupyter Notebook with PySpark
 Currently, the Cavium configuration only supports Python 2.7 on Jupyter.
 
-1. Open a command prompt/terminal in Windows/Mac. You should have putty in your PATH (for Windows).  Port 8889 is arbitrarily chosen.  
+1. Open a command prompt/terminal in Windows/Mac. You should have putty in your PATH (for Windows).  Port 8889 is arbitrarily chosen.  The first localhost port is for your local machine. The second localhost port is for Cavium. They do not necessarily have to be the same.  
 `putty.exe -ssh -L localhost:8889:localhost:8889 cavium-thunderx.arc-ts.umich.edu` (Windows)  
 `ssh -L localhost:8889:localhost:8889 cavium-thunderx.arc-ts.umich.edu` (Mac/Linux)
 2. This should open a ssh client for Cavium. Log in as usual.
@@ -78,11 +78,13 @@ Currently, the Cavium configuration only supports Python 2.7 on Jupyter.
 ```
 export PYSPARK_PYTHON=/bin/python3  # not functional code
 export PYSPARK_DRIVER_PYTHON=jupyter  
-export PYSPARK_DRIVER_PYTHON_OPTS='notebook --no-browser --port=8889'  
+export PYSPARK_DRIVER_PYTHON_OPTS='notebook --no-browser --port=8889'  # same as second port listed above
 pyspark --master yarn --queue workshop --num-executors 500 --executor-memory 5g --conf spark.ui.port=XXXX
 ```
 4. Copy/paste the URL (from your terminal where you launched jupyter notebook) into your browser. The URL should look something like this but with a different token.
-http://localhost:8889/?token=745f8234f6d0cf3b362404ba32ec7026cb6e5ea7cc960856
+http://localhost:8889/?token=745f8234f6d0cf3b362404ba32ec7026cb6e5ea7cc960856  
+If the first localhost port is different from the second, then change the url to match the first port number in order for Jupyter notebook to show up.
+
 5. You should be connected.
 
 ## Example: Parsing JSON
