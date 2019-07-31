@@ -38,7 +38,7 @@ SSH to `cavium-thunderx.arc-ts.umich.edu` `Port 22` using a SSH client (e.g. PuT
 ### Setting Python Version 
 Change Python version for PySpark to Python 3.X (instead of default Python 2.7) 
 
-```
+```bash
 export PYSPARK_PYTHON=/bin/python3  
 export PYSPARK_DRIVER_PYTHON=/bin/python3
 ```
@@ -58,7 +58,7 @@ The interactive shell does not start with a clean slate. It already has several 
 - `spark` is a SparkSession object
 
 You can check this by typing the variable names.
-```
+```python
 sc
 sqlContext
 spark
@@ -75,7 +75,7 @@ Currently, the Cavium configuration only supports Python 2.7 on Jupyter.
 `ssh -L localhost:8889:localhost:8889 cavium-thunderx.arc-ts.umich.edu` (Mac/Linux)
 2. This should open a ssh client for Cavium. Log in as usual.
 3. From the Cavium terminal, type the following (replace XXXX with number between 4050 and 4099):
-```
+```bash
 export PYSPARK_PYTHON=/bin/python3  # not functional code
 export PYSPARK_DRIVER_PYTHON=jupyter  
 export PYSPARK_DRIVER_PYTHON_OPTS='notebook --no-browser --port=8889'  # same as second port listed above
@@ -92,7 +92,7 @@ Generic PySpark data wrangling commands can be found at https://github.com/caocs
 
 ### Read in twitter file
 The twitter data is stored in JSONLINES format and compressed using bz2. PySpark has a `sqlContext.read.json` function that can handle this for us (including the decompression).
-```
+```python
 import os
 wdir = '/var/twitter/decahose/raw'
 df = sqlContext.read.json(os.path.join(wdir,'decahose.2018-03-02.p2.bz2'))
@@ -110,7 +110,7 @@ The schema shows the "root-level" attributes as columns of the dataframe. Any ne
 
 ### Selecting Data
 For example, if we wanted to see what the tweet text is and when it was created, we could do the following.
-```
+```python
 tweet = df.select('created_at','text')
 tweet.printSchema()
 tweet.show(5)
@@ -122,7 +122,7 @@ The output is truncated by default. We can override this using the truncate argu
 #### Getting Nested Data
 What if we wanted to get at data that was nested? Like in `user`.
 
-```
+```python
 user = df.select('user')
 user.printSchema()
 user.show(1, truncate=False)
@@ -130,26 +130,26 @@ user.show(1, truncate=False)
 This returns a single column `user` with the nested data in a list (technically a `struct`).
 
 We can select nested data using the `.` notation.
-```
+```python
 names = df.select('user.name','user.screen_name')
 names.printSchema()
 names.show(5)
 ```
 To expand ALL the data into individual columns, you can use the `.*` notation.
-```
+```python
 allcolumns = df.select('user.*')
 allcolumns.printSchema()
 allcolumns.show(4)
 ```
 
 Some nested data is stored in an `array` instead of `struct`.
-```
+```python
 arr = df.select('entities.user_mentions.name')
 arr.printSchema()
 arr.show(5)
 ```
 The data is stored in an `array` similar as before. We can use the `explode` function to extract the data from an `array`.
-```
+```python
 from pyspark.sql.functions import explode
 
 arr2 = df.select(explode('entities.user_mentions.name'))
@@ -164,7 +164,7 @@ If we wanted multiple columns under user_mentions, we'd be tempted to use multip
 This generates an error: *Only one generator allowed per select clause but found 2:*
 
 We can get around this by using `explode` on the top most key with an `alias` and then selecting the columns of interest.
-```
+```python
 mentions = df.select(explode('entities.user_mentions').alias('user_mentions'))
 mentions.printSchema()
 mentions2 = mentions.select('user_mentions.name','user_mentions.screen_name')
@@ -173,13 +173,13 @@ mentions2.show(5)
 
 #### Getting Nested Data II
 What if we wanted to get at data in a list? Like the indices in `user_mentions`.
-```
+```python
 idx = mentions.select('user_mentions.indices')
 idx.printSchema()
 idx.show(5)
 ```
 The schema shows that the data is in an `array` type. For some reason, `explode` will put each element in its own row. Instead, we can use the `withColumn` method to index the list elements.
-```
+```python
 idx2 = idx.withColumn('first', idx['indices'][0]).withColumn('second', idx['indices'][1])
 idx2.show(5)
 ```
@@ -196,13 +196,13 @@ The equivalent of a PySpark Dataframe would be like this:
 
 ### Saving Data
 Once you have constructed your PySpark DataFrame of interest, you should save it (append or overwrite) as a parquet file as so.
-```
+```python
 folder = 'twitterExtract'
 df.write.mode('append').parquet(folder)
 ```
 ### Complete Script
 Here is a sample script which combines everything we just covered. It extracts a four column DataFrame.
-```
+```python
 import os
 
 wdir = '/var/twitter/decahose/raw'
@@ -215,7 +215,7 @@ six.write.mode('overwrite').parquet(folder)
 
 ## Example: Finding text in a Tweet 
 Read in parquet file.
-```
+```python
 folder = 'twitterDemo'
 df = sqlContext.read.parquet(folder)
 ```
@@ -223,41 +223,41 @@ Below are several ways to match text
 ***
 
 Exact match `==`
-```
+```python
 hello = df.filter(df.text == 'hello world')
 hello.show(10)
 ```
 
 `contains` method
-```
+```python
 food = df.filter(df['text'].contains(' food'))
 food = food.select('text')
 food.show(10, truncate=False)
 ```
 
 `startswith` method
-```
+```python
 once = df.filter(df.text.startswith('Once'))
 once = once.select('text')
 once.show(10, truncate=False)
 ```
 
 `endswith` method
-```
+```python
 ming = df.filter(df['text'].endswith('ming'))
 ming = ming.select('text')
 ming.show(10, truncate=False)
 ```
 
 `like` method using SQL wildcards
-```
+```python
 mom = df.filter(df.text.like('%mom_'))
 mom = mom.select('text')
 mom.show(10, truncate=False)
 ```
 
 regular expressions ([workshop material](https://github.com/caocscar/workshops/tree/master/regex))
-```
+```python
 regex = df.filter(df['text'].rlike('[ia ]king'))
 regex = regex.select('text')
 regex.show(10, truncate=False)
@@ -267,7 +267,7 @@ Applying more than one condition. When building DataFrame boolean expressions, u
 - `&` for `and`
 - `|` for `or`
 - `~` for `not`  
-```
+```python
 resta = df.filter(df.text.contains('resta') & df.text.endswith('ing'))
 resta = resta.select('text')
 resta.show(10, truncate=False)
@@ -278,7 +278,7 @@ resta.show(10, truncate=False)
 ## Example: Filtering Tweets by Location
 
 Read in parquet file.
-```
+```python
 folder = 'twitterDemo'
 df = sqlContext.read.parquet(folder)
 ```
@@ -290,12 +290,12 @@ From the [Twitter Geo-Objects documentation](https://developer.twitter.com/en/do
 
 ### Coordinates
 Select Tweets that have gps coordinates
-```
+```python
 coords = df.filter(df['coordinates'].isNotNull())
 ```
 
 Construct a longitude and latitude column
-```
+```python
 coords = coords.withColumn('lng', coords['coordinates.coordinates'][0])
 coords = coords.withColumn('lat', coords['coordinates.coordinates'][1])
 coords.printSchema()
@@ -303,7 +303,7 @@ coords.show(5, truncate=False)
 ```
 
 Apply a bounding box to tweets and count number of matching tweets
-```
+```python
 A2 = coords.filter(coords['lng'].between(-84,-83) & coords['lat'].between(42,43))
 A2.show(5, truncate=False)
 A2.count()
@@ -314,7 +314,7 @@ A2.count()
 Search for places by name 
 
 Create separate columns from `place` object
-```
+```python
 place = df.filter(df['place'].isNotNull())
 place = place.select('place.country', 'place.country_code', 'place.place_type','place.name', 'place.full_name')
 place.printSchema()
@@ -322,7 +322,7 @@ place.show(10, truncate=False)
 ```
 
 Apply place filter
-```
+```python
 MI = place.filter(place['full_name'].contains(' MI'))
 MI.show(10, truncate=False)
 MI.count()
@@ -337,10 +337,15 @@ There are five kinds of `place_type` in the twitter dataset in approximately des
 4. neighborhood
 5. poi (point of interest)
 
-Here's a breakdown of the relative frequency for this dataset (Note: Percentages have been added post-hoc and won't show up in the SQL result)
-```
+Here's a breakdown of the relative frequency for this dataset.
+```python
+import pyspark.sql.functions as f
+from pyspark.sql.window import Window
+
 place.registerTempTable('Places')
 place_type_ct = sqlContext.sql('SELECT place_type, COUNT(*) as ct FROM Places GROUP BY place_type ORDER BY ct DESC')
+place_type_ct = place_type_ct.withColumn('pct', f.format_number(f.lit(100) * f.col('ct') / f.sum('ct').over(Window.partitionBy()),2))
+place_type_ct = place_type_ct.orderBy('ct', ascending=False)
 place_type_ct.show()
 ```
 |place_type|count|pct|
@@ -353,7 +358,7 @@ place_type_ct.show()
 
 Here are some examples of each `place_type`:
 #### Country
-```
+```python
 country = sqlContext.sql("SELECT * FROM Places WHERE place_type = 'country'")
 country.show(5, truncate=False)
 ```
@@ -366,7 +371,7 @@ country.show(5, truncate=False)
 |República de Moçambique|MZ|country|República de Moçambique|República de Moçambique|
 
 #### Admin (US examples)
-```
+```python
 admin = sqlContext.sql("SELECT * FROM Places WHERE place_type = 'admin' AND country_code = 'US'")
 admin.show(10, truncate=False)
 ```
@@ -384,7 +389,7 @@ admin.show(10, truncate=False)
 |United States|US|admin|Indiana|Indiana, USA|
 
 #### City
-```
+```python
 city = sqlContext.sql("SELECT * FROM Places WHERE place_type = 'city'")
 city.show(5, truncate=False)
 ```
@@ -396,7 +401,7 @@ city.show(5, truncate=False)
 |Germany|DE|city|Illmensee|Illmensee, Deutschland|
 |Ireland|IE|city|Kildare|Kildare, Ireland|
 #### Neighborhood (US examples)
-```
+```python
 neighborhood = sqlContext.sql("SELECT * FROM Places WHERE place_type = 'neighborhood' AND country_code = 'US'")
 neighborhood.show(10, truncate=False)
 ```
@@ -413,7 +418,7 @@ neighborhood.show(10, truncate=False)
 |United States|US|neighborhood|Noe Valley|Noe Valley, San Francisco|
 |United States|US|neighborhood|The Las Vegas Strip|The Las Vegas Strip, Paradise|
 #### POI (US examples)
-```
+```python
 poi = sqlContext.sql("SELECT * FROM Places WHERE place_type = 'poi' AND country_code = 'US'")
 poi.show(10, truncate=False)
 ```
