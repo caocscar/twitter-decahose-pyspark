@@ -344,17 +344,17 @@ from pyspark.sql.window import Window
 
 place.registerTempTable('Places')
 place_type_ct = sqlContext.sql('SELECT place_type, COUNT(*) as ct FROM Places GROUP BY place_type ORDER BY ct DESC')
-place_type_ct = place_type_ct.withColumn('pct', f.format_number(f.lit(100) * f.col('ct') / f.sum('ct').over(Window.partitionBy()),2))
+place_type_ct = place_type_ct.withColumn('pct', f.format_number(f.lit(100) * f.col('ct') / f.sum('ct').over(Window.partitionBy()),1))
 place_type_ct = place_type_ct.orderBy('ct', ascending=False)
 place_type_ct.show()
 ```
 |place_type|count|pct|
 |:---:|---:|---:|
-|city|1738893|84.1%|
-|admin|221170|10.7%|
-|country|79811|3.9%|
-|poi|24701|1.2%|
-|neighborhood|3343|0.2%|
+|city|1738893|84.1|
+|admin|221170|10.7|
+|country|79811|3.9|
+|poi|24701|1.2|
+|neighborhood|3343|0.2|
 
 Here are some examples of each `place_type`:
 #### Country
