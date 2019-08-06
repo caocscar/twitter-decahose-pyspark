@@ -289,7 +289,7 @@ From the [Twitter Geo-Objects documentation](https://developer.twitter.com/en/do
 > The `place` object is always present when a Tweet is geo-tagged, while the `coordinates` object is only present (non-null) when the Tweet is assigned an exact location. If an exact location is provided, the `coordinates` object will provide a [long, lat] array with the geographical coordinates, and a Twitter Place that corresponds to that location will be assigned.
 
 ### Coordinates
-Select Tweets that have gps coordinates
+Select Tweets that have gps coordinates. In this dataset, **157,954 / 173,398,330 tweets (~0.1%)** have `coordinates`.
 ```python
 coords = df.filter(df['coordinates'].isNotNull())
 ```
@@ -311,7 +311,7 @@ A2.count()
 **Done!**
 
 ### Place
-Search for places by name 
+Search for places by name. In this dataset, **2,067,918 / 173,398,330 tweets (~1.2%)** have `place`.
 
 Create separate columns from `place` object
 ```python
@@ -337,7 +337,7 @@ There are five kinds of `place_type` in the twitter dataset in approximately des
 4. neighborhood
 5. poi (point of interest)
 
-Here's a breakdown of the relative frequency for this dataset.
+Here's a breakdown of the relative frequency for this dataset. 
 ```python
 import pyspark.sql.functions as f
 from pyspark.sql.window import Window
