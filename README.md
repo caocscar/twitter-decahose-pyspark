@@ -201,7 +201,7 @@ folder = 'twitterExtract'
 df.write.mode('append').parquet(folder)
 ```
 ### Complete Script
-Here is a sample script which combines everything we just covered. It extracts a four column DataFrame.
+Here is a sample script which combines everything we just covered. It extracts a six column DataFrame.
 ```python
 import os
 
