@@ -59,15 +59,13 @@ spark
 Type `exit()` or press Ctrl-D
 
 ## Using Jupyter Notebook with PySpark
-Currently, the Cavium configuration only supports Python 2.7 on Jupyter.
-
 1. Open a command prompt/terminal in Windows/Mac. You should have PuTTY in your PATH (for Windows).  Port 8889 is arbitrarily chosen.  The first localhost port is for your local machine. The second localhost port is for Cavium. They do not necessarily have to be the same.  
 `putty.exe -ssh -L localhost:8889:localhost:8889 cavium-thunderx.arc-ts.umich.edu` (Windows)  
 `ssh -L localhost:8889:localhost:8889 cavium-thunderx.arc-ts.umich.edu` (Mac/Linux)
 2. This should open a ssh client for Cavium. Log in as usual.
 3. From the Cavium terminal, type the following (replace XXXX with number between 4050 and 4099):
 ```bash
-export PYSPARK_PYTHON=/bin/python3  # not functional code
+export PYSPARK_PYTHON=/bin/python3  # set Python to 3.7; default is 2.7
 export PYSPARK_DRIVER_PYTHON=jupyter  
 export PYSPARK_DRIVER_PYTHON_OPTS='notebook --no-browser --port=8889'  # same as second port listed above
 pyspark --master yarn --queue default --num-executors 500 --executor-memory 5g --conf spark.ui.port=XXXX
