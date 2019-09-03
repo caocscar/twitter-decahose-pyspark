@@ -5,7 +5,6 @@ Go directly to Jupyter Notebook viewer version
 
 ## Table of Contents <!-- omit in toc -->
 - [UM Hadoop Cavium Cluster](#um-hadoop-cavium-cluster)
-  - [Setting Python Version](#setting-python-version)
 - [PySpark Interactive Shell](#pyspark-interactive-shell)
   - [Exit Interactive Shell](#exit-interactive-shell)
 - [Using Jupyter Notebook with PySpark](#using-jupyter-notebook-with-pyspark)
