@@ -35,14 +35,6 @@ SSH to `cavium-thunderx.arc-ts.umich.edu` `Port 22` using a SSH client (e.g. PuT
 
 **Note:** ARC-TS has a [Getting Started with Hadoop User Guide](http://arc-ts.umich.edu/new-hadoop-user-guide/)
 
-### Setting Python Version 
-Change Python version for PySpark to Python 3.X (instead of default Python 2.7) 
-
-```bash
-export PYSPARK_PYTHON=/bin/python3  
-export PYSPARK_DRIVER_PYTHON=/bin/python3
-```
-
 ## PySpark Interactive Shell
 The interactive shell is analogous to a python console. The following command starts up the interactive shell for PySpark with default settings in the `default` queue.  
 `pyspark --master yarn --queue default`
