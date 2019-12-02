@@ -297,7 +297,7 @@ Apply a bounding box to tweets and count number of matching tweets
 ```python
 A2 = coords.filter(coords['lng'].between(-84,-83) & coords['lat'].between(42,43))
 A2.show(5, truncate=False)
-A2.count() # 652
+A2.count()
 ```
 
 Suppose you have a different bounding box you want to apply to each row instead of a constant. Let's set up a fake dataset where we have a bounding box specified first.
