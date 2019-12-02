@@ -297,8 +297,26 @@ Apply a bounding box to tweets and count number of matching tweets
 ```python
 A2 = coords.filter(coords['lng'].between(-84,-83) & coords['lat'].between(42,43))
 A2.show(5, truncate=False)
-A2.count()
+A2.count() # 652
 ```
+
+Suppose you have a different bounding box you want to apply to each row instead of a constant. Let's set up a fake dataset where we have a bounding box specified first.
+```python
+from pyspark.sql.functions import rand
+A2 = A2.withColumn('bbox_x1', rand()-84.5)
+A2 = A2.withColumn('bbox_x2', rand()-83.5)
+A2 = A2.withColumn('bbox_y1', rand()+41.5)
+A2 = A2.withColumn('bbox_y2', rand()+42.5)
+```
+
+Now we can apply a filter as before. But now, we use the `col` function to return a `Column` type
+```python
+from pyspark.sql.functions import col
+A2_bbox = A2.filter(coords['lng'].between(col('bbox_x1'),col('bbox_x2')) & coords['lat'].between(col('bbox_y1'),col('bbox_y2')))
+A2_bbox.show(5)
+A2_bbox.count()
+```
+
 **Done!**
 
 ### Place
