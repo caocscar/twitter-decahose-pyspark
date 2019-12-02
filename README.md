@@ -309,7 +309,7 @@ A2 = A2.withColumn('bbox_y1', rand()+41.5)
 A2 = A2.withColumn('bbox_y2', rand()+42.5)
 ```
 
-Now we can apply a filter as before. But now, we use the `col` function to return a `Column` type
+Now we can apply a filter as before. But now, we use the `col` function to return a `Column` type instead of a constant.
 ```python
 from pyspark.sql.functions import col
 A2_bbox = A2.filter(coords['lng'].between(col('bbox_x1'),col('bbox_x2')) & coords['lat'].between(col('bbox_y1'),col('bbox_y2')))
