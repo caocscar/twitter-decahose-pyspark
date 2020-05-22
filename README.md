@@ -58,7 +58,7 @@ spark
 ### Exit Interactive Shell
 Type `exit()` or press Ctrl-D
 
-## Using Jupyter Notebook with PySpark
+## Using Jupyter Notebook with PySpark (optional)
 **Note**: Jupyter notebooks do not run on the Cavium cluster. They currently only run on the login node. This means only the login node's resources (i.e. less resources than the cluster) are available to the Jupyter notebook.
 
 1. Open a command prompt/terminal in Windows/Mac. You should have PuTTY in your PATH (for Windows).  Port 8889 is arbitrarily chosen.  The first localhost port is for your local machine. The second localhost port is for Cavium. They do not necessarily have to be the same.  
