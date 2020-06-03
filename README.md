@@ -7,6 +7,7 @@ Go directly to Jupyter Notebook viewer version (with sample output)
 - [UM Hadoop Cavium Cluster](#um-hadoop-cavium-cluster)
 - [PySpark Interactive Shell](#pyspark-interactive-shell)
   - [Exit Interactive Shell](#exit-interactive-shell)
+- [Using Python 3](#using-python-3)
 - [Using Jupyter Notebook with PySpark](#using-jupyter-notebook-with-pyspark)
 - [Example: Parsing JSON](#example-parsing-json)
   - [Read in twitter file](#read-in-twitter-file)
@@ -58,6 +59,12 @@ spark
 ### Exit Interactive Shell
 Type `exit()` or press Ctrl-D
 
+## Using Python 3
+The current default python version for pyspark is 2.7. To set it up for Python 3, type the following in the terminal before launching the shell.
+```bash
+export PYSPARK_PYTHON=/bin/python3
+```
+
 ## Using Jupyter Notebook with PySpark (optional)
 **Note**: Jupyter notebooks do not run on the Cavium cluster. They currently only run on the login node. This means only the login node's resources (i.e. less resources than the cluster) are available to the Jupyter notebook.
 
@@ -67,7 +74,7 @@ Type `exit()` or press Ctrl-D
 2. This should open a ssh client for Cavium. Log in as usual.
 3. From the Cavium terminal, type the following (replace XXXX with number between 4050 and 4099):
 ```bash
-export PYSPARK_PYTHON=/bin/python3  # set Python to 3.7; default is 2.7
+export PYSPARK_PYTHON=/bin/python3  # Jupyter notebook setup only supports Python 2.7; this is a placeholder for when it's fixed
 export PYSPARK_DRIVER_PYTHON=jupyter  
 export PYSPARK_DRIVER_PYTHON_OPTS='notebook --no-browser --port=8889'  # same as second port listed above
 pyspark --master yarn --queue default --num-executors 500 --executor-memory 5g --conf spark.ui.port=XXXX
