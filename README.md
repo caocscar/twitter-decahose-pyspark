@@ -74,9 +74,9 @@ export PYSPARK_PYTHON=/bin/python3
 2. This should open a ssh client for Cavium. Log in as usual.
 3. From the Cavium terminal, type the following (replace XXXX with number between 4050 and 4099):
 ```bash
-export PYSPARK_PYTHON=/bin/python3  # Jupyter notebook setup only supports Python 2.7; this is a placeholder for when it's fixed
 export PYSPARK_DRIVER_PYTHON=jupyter  
 export PYSPARK_DRIVER_PYTHON_OPTS='notebook --no-browser --port=8889'  # same as second port listed above
+export PYSPARK_PYTHON=/bin/python3  # Jupyter notebook setup only supports Python 2.7; this is a placeholder for when it's fixed
 pyspark --master yarn --queue default --num-executors 500 --executor-memory 5g --conf spark.ui.port=XXXX
 ```
 4. Copy/paste the URL (from your terminal where you launched jupyter notebook) into your browser. The URL should look something like this but with a different token.
