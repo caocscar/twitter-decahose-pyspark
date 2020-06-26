@@ -39,7 +39,7 @@ SSH to `cavium-thunderx.arc-ts.umich.edu` `Port 22` using a SSH client (e.g. PuT
 The interactive shell is analogous to a python console. The following command starts up the interactive shell for PySpark with default settings in the `default` queue.  
 `pyspark --master yarn --queue default`
 
-The following line adds some custom settings.  The 'XXXX' should be a number between 4050 and 4099.  
+The following line adds some custom settings.  The 'XXXX' should be a number between 4040 and 4150.  
 `pyspark --master yarn --queue default --num-executors 500 --executor-memory 5g --conf spark.ui.port=XXXX`
 
 **Note:** You might get a warning message that looks like `WARN Utils: Service 'SparkUI' could not bind on port 40XX. Attempting port 40YY.` This usually resolves itself after a few seconds. If not, try again at a later time.
@@ -72,7 +72,7 @@ export PYSPARK_PYTHON=/bin/python3
 `putty.exe -ssh -L localhost:8889:localhost:8889 cavium-thunderx.arc-ts.umich.edu` (Windows)  
 `ssh -L localhost:8889:localhost:8889 uniqname@cavium-thunderx.arc-ts.umich.edu` (Mac/Linux)
 2. This should open a ssh client for Cavium. Log in as usual.
-3. From the Cavium terminal, type the following (replace XXXX with number between 4050 and 4099):
+3. From the Cavium terminal, type the following (replace XXXX with number between 4040 and 4150):
 ```bash
 export PYSPARK_DRIVER_PYTHON=jupyter  
 export PYSPARK_DRIVER_PYTHON_OPTS='notebook --no-browser --port=8889'  # same as second port listed above
