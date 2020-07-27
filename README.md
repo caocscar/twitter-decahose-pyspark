@@ -62,7 +62,7 @@ Type `exit()` or press Ctrl-D
 ## Using Python 3
 The current default python version for pyspark is 2.7. To set it up for Python 3, type the following in the terminal before launching the shell.
 ```bash
-export PYSPARK_PYTHON=/bin/python3
+export PYSPARK_PYTHON=/sw/dsi/aarch64/centos7/python/3.7.4/bin/python3
 ```
 
 ## Using Jupyter Notebook with PySpark (optional)
@@ -76,7 +76,7 @@ export PYSPARK_PYTHON=/bin/python3
 ```bash
 export PYSPARK_DRIVER_PYTHON=jupyter  
 export PYSPARK_DRIVER_PYTHON_OPTS='notebook --no-browser --port=8889'  # same as second port listed above
-export PYSPARK_PYTHON=/bin/python3  # Jupyter notebook setup only supports Python 2.7; this is a placeholder for when it's fixed
+export PYSPARK_PYTHON=/sw/dsi/aarch64/centos7/python/3.7.4/bin/python3  # Jupyter notebook setup only supports Python 2.7; this is a placeholder for when it's fixed
 pyspark --master yarn --queue default --num-executors 500 --executor-memory 5g --conf spark.ui.port=XXXX
 ```
 4. Copy/paste the URL (from your terminal where you launched jupyter notebook) into your browser. The URL should look something like this but with a different token.
