@@ -466,6 +466,34 @@ From the [Twitter documentation about language](https://developer.twitter.com/en
 
 > **Note**: if no language classification can be made the provided result is ‘und’ (for undefined).
 
+Let's look at the first few rows of tweets.
+```python
+tweets = df.select('lang','text')
+tweets.show(20, truncate=False)
+```
+lang|text
+---|---
+en|One thing I love as much as traveling to see my favorite bands, is seeing my friends/mutuals travel to see their favorite bands. 🥰
+en|RT @calumstruly: ashton: the truth luke: https://t.co/XbFOKBPd6B
+en|Best me to JA!
+ko|RT @BTSW_official: [#BTSWORLD_OST] "다시 널 찾을거야, 운명처럼💜" 드디어! #방탄소년단 이 열심히 부른 BTS WORLD OST 타이틀곡! &lt;Heartbeat&gt;가 나왔습니다! (👏🏻) 매니저님을 위한 특별한 선물…
+ja|いやwwww逆に運良すぎかwwww三枚目wwww https://t.co/7WgmYTrFWu
+en|RT @kookpics: cr. _FE_JK0901 - #JUNGKOOK #정국 @BTS_twt https://t.co/gFOMHUN5f2
+en|RT @ughhhsierra: it’s been a couple months since i’ve felt like i’m home
+tr|@gulsumm_c Of ne güzel hava attın esti buralar  skkdkd
+ar|RT @nj1la: ضيفني+لآيكك+رتويت+سوي فولو من الرتويت واللآيكات. وآضمن لك آكثر من ٥٠٠ متابع في ساعة. يلا ضيفوا بعض. وتابعوني.🖤🖤 July 01, 2019 at…
+und|RT @carluxokuster: https://t.co/7W3k6FrFK4
+ar|RT @Jurgen3ziz: كانت مُجرد نظرة إلى الأرض لمُدة 17 ثانية ..كانت مُجرد درس قصير تم فهمه في ثواني ..كانت مُجرد تساؤل: إلى أين سنصل ياتُرى ؟…
+es|Soñé que conocía a Tom Holland y me daba un besito y ahora estoy triste porque no pasó
+tr|ölüşüm ama sanki böyle ölmemişim gibiyim
+ja|【絶対1位】高橋あゆみのどんどん動画 現正廣播中！！https://t.co/xOic40JFch
+th|@MESa131_ ขนาดเดินวนรอบเขาแล้วเรียกฟุคุซาวะซัง ฟุคุซาวะซังงงงง
+ja|RT @BLUESOLVALOU: 『父にサビを歌われて剣を抜く娘』の詳細を調べてたら日が暮れたでござるの巻 https://t.co/azYUKq2BTx
+pt|@theskindoctor13 @ANI @humasqureshi Huma mam real life Mai Laila vaale gunde yahi h
+ja|RT @katsuse_m: 梅雨の雰囲気ばかりなタイムラインに、花火してるギャルのツイートが流れてきた。自分の知らないところで夏が始まってた。その次のツイートで知らないOLが「彼氏と別れた」とフォロワーに報告してた。いいねで回ってきてた。ちっともよくなさそうだった。自分の知ら…
+ja|RT @aikanium: 祇園のカラーコーンの隠し方が私は好きで。カラーコーンなんてあったら確実にvisual pollutionになるのに、これだと逆にあった方がアクセントになってかわいいかも？と思えるくらいの見た目。そこまで持っていけるのすごい。 https://t.co…
+in|RT @YourAverageOta3: Banger✊ https://t.co/eyJptcI31z
+
 Let's look at the distribution of languages.
 ```python
 languages = df.groupBy('lang').count().orderBy('count', ascending=False)
@@ -496,34 +524,6 @@ Polish|pl|93276|0.3
 Dutch|nl|78095|0.2
 
 **Note**: I've tacked on the `language` column for clarification.
-
-Let's look at the first few rows of tweets.
-```python
-tweets = df.select('lang','text')
-tweets.show(20, truncate=False)
-```
-lang|text
----|---
-en|One thing I love as much as traveling to see my favorite bands, is seeing my friends/mutuals travel to see their favorite bands. 🥰
-en|RT @calumstruly: ashton: the truth luke: https://t.co/XbFOKBPd6B
-en|Best me to JA!
-ko|RT @BTSW_official: [#BTSWORLD_OST] "다시 널 찾을거야, 운명처럼💜" 드디어! #방탄소년단 이 열심히 부른 BTS WORLD OST 타이틀곡! &lt;Heartbeat&gt;가 나왔습니다! (👏🏻) 매니저님을 위한 특별한 선물…
-ja|いやwwww逆に運良すぎかwwww三枚目wwww https://t.co/7WgmYTrFWu
-en|RT @kookpics: cr. _FE_JK0901 - #JUNGKOOK #정국 @BTS_twt https://t.co/gFOMHUN5f2
-en|RT @ughhhsierra: it’s been a couple months since i’ve felt like i’m home
-tr|@gulsumm_c Of ne güzel hava attın esti buralar  skkdkd
-ar|RT @nj1la: ضيفني+لآيكك+رتويت+سوي فولو من الرتويت واللآيكات. وآضمن لك آكثر من ٥٠٠ متابع في ساعة. يلا ضيفوا بعض. وتابعوني.🖤🖤 July 01, 2019 at…
-und|RT @carluxokuster: https://t.co/7W3k6FrFK4
-ar|RT @Jurgen3ziz: كانت مُجرد نظرة إلى الأرض لمُدة 17 ثانية ..كانت مُجرد درس قصير تم فهمه في ثواني ..كانت مُجرد تساؤل: إلى أين سنصل ياتُرى ؟…
-es|Soñé que conocía a Tom Holland y me daba un besito y ahora estoy triste porque no pasó
-tr|ölüşüm ama sanki böyle ölmemişim gibiyim
-ja|【絶対1位】高橋あゆみのどんどん動画 現正廣播中！！https://t.co/xOic40JFch
-th|@MESa131_ ขนาดเดินวนรอบเขาแล้วเรียกฟุคุซาวะซัง ฟุคุซาวะซังงงงง
-ja|RT @BLUESOLVALOU: 『父にサビを歌われて剣を抜く娘』の詳細を調べてたら日が暮れたでござるの巻 https://t.co/azYUKq2BTx
-pt|@theskindoctor13 @ANI @humasqureshi Huma mam real life Mai Laila vaale gunde yahi h
-ja|RT @katsuse_m: 梅雨の雰囲気ばかりなタイムラインに、花火してるギャルのツイートが流れてきた。自分の知らないところで夏が始まってた。その次のツイートで知らないOLが「彼氏と別れた」とフォロワーに報告してた。いいねで回ってきてた。ちっともよくなさそうだった。自分の知ら…
-ja|RT @aikanium: 祇園のカラーコーンの隠し方が私は好きで。カラーコーンなんてあったら確実にvisual pollutionになるのに、これだと逆にあった方がアクセントになってかわいいかも？と思えるくらいの見た目。そこまで持っていけるのすごい。 https://t.co…
-in|RT @YourAverageOta3: Banger✊ https://t.co/eyJptcI31z
 
 To filter out only spanish tweets, we can use the `filter` method.
 ```python
