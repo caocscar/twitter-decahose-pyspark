@@ -8,7 +8,7 @@ Go directly to Jupyter Notebook viewer version (with sample output)
 - [PySpark Interactive Shell](#pyspark-interactive-shell)
   - [Exit Interactive Shell](#exit-interactive-shell)
 - [Using Python 3](#using-python-3)
-- [Using Jupyter Notebook with PySpark](#using-jupyter-notebook-with-pyspark)
+- [Using Jupyter Notebook with PySpark](#using-jupyter-notebook-with-pyspark-optional)
 - [Example: Parsing JSON](#example-parsing-json)
   - [Read in twitter file](#read-in-twitter-file)
   - [Selecting Data](#selecting-data)
@@ -27,6 +27,8 @@ Go directly to Jupyter Notebook viewer version (with sample output)
     - [City](#city)
     - [Neighborhood (US examples)](#neighborhood-us-examples)
     - [POI (US examples)](#poi-us-examples)
+- [Example: Filtering Tweets by Language](#example-filtering-tweets-by-language)
+
 
 ## UM Hadoop Cavium Cluster
 Twitter data already resides in a directory on Cavium. Log in to Cavium to get started.
@@ -40,7 +42,7 @@ The interactive shell is analogous to a python console. The following command st
 `pyspark --master yarn --queue default`
 
 The following line adds some custom settings.  The 'XXXX' should be a number between 4040 and 4150.  
-`pyspark --master yarn --queue default --num-executors 500 --executor-memory 5g --conf spark.ui.port=XXXX`
+`pyspark --master yarn --queue default --executor-cores 5 --num-executors 200 --executor-memory 3g`
 
 **Note:** You might get a warning message that looks like `WARN Utils: Service 'SparkUI' could not bind on port 40XX. Attempting port 40YY.` This usually resolves itself after a few seconds. If not, try again at a later time.
 
@@ -77,7 +79,7 @@ export PYSPARK_PYTHON=/sw/dsi/aarch64/centos7/python/3.7.4/bin/python3
 export PYSPARK_DRIVER_PYTHON=jupyter  
 export PYSPARK_DRIVER_PYTHON_OPTS='notebook --no-browser --port=8889'  # same as second port listed above
 export PYSPARK_PYTHON=/sw/dsi/aarch64/centos7/python/3.7.4/bin/python3  # Jupyter notebook setup only supports Python 2.7; this is a placeholder for when it's fixed
-pyspark --master yarn --queue default --num-executors 500 --executor-memory 5g --conf spark.ui.port=XXXX
+pyspark --master yarn --queue default --executor-cores 5 --num-executors 200 --executor-memory 3g --conf spark.ui.port=XXXX
 ```
 4. Copy/paste the URL (from your terminal where you launched jupyter notebook) into your browser. The URL should look something like this but with a different token.
 http://localhost:8889/?token=745f8234f6d0cf3b362404ba32ec7026cb6e5ea7cc960856  
@@ -93,7 +95,7 @@ The twitter data is stored in JSONLINES format and compressed using bz2. PySpark
 ```python
 import os
 wdir = '/var/twitter/decahose/raw'
-df = sqlContext.read.json(os.path.join(wdir,'decahose.2018-03-02.p2.bz2'))
+df2 = sqlContext.read.json(os.path.join(wdir,'decahose.2018-03-02.p2.bz2'))
 ```
 This reads the JSONLINES data into a PySpark DataFrame. We can see the structure of the JSON data using the `printSchema` method.
 
@@ -450,3 +452,94 @@ poi.show(10, truncate=False)
 |United States|US|poi|Lower Keys Medical Center|Lower Keys Medical Center|
 |United States|US|poi|Mockingbird Vista|Mockingbird Vista|
 |United States|US|poi|Starbucks|Starbucks|
+
+## Example: Filtering Tweets by Language
+Read in parquet file
+```python
+wdir = '/data/twitter/decahose/parquet'
+df = spark.read.parquet(os.path.join(wdir,'decahose.2019-07-01*'))
+```
+
+From the [Twitter documentation about language](https://developer.twitter.com/en/docs/twitter-api/v1/tweets/filter-realtime/guides/premium-operators):
+
+> Matches Tweets that have been classified by Twitter as being of a particular language (if, and only if, the tweet has been classified). It is important to note that each Tweet is currently only classified as being of one language, so AND’ing together multiple languages will yield no results.
+
+> **Note**: if no language classification can be made the provided result is ‘und’ (for undefined).
+
+Let's look at the distribution of languages.
+```python
+languages = df.groupBy('lang').count().orderBy('count', ascending=False)
+languages.show(20)
+```                                                            
+language|lang|count|
+---|:---:|---:|
+English|en|10858344|
+Japanese|ja|6475431|
+Spanish|es|2828876|
+undefined|und|2495456|
+Portuguese|pt|2356523|
+Arabic|ar|1994858|
+Thai|th|1639563|
+Korean|ko|1505357|
+Indonesian|in|987514|
+French|fr|765138|
+Turkish|tr|685058|
+Tagalog|tl|521548|
+Italian|it|198574|
+Russian|ru|193590|
+Hindi|hi|167066|
+German|de|142481|
+Urdu|ur|104673|
+Persian|fa|96038|
+Polish|pl|93276|
+Dutch|nl|78095|
+
+**Note**: I've tacked on the `language` column for clarification.
+
+Let's look at the first few rows of tweets.
+```python
+tweets = df.select('lang','text')
+tweets.show(20, truncate=False)
+```
+lang|text
+---|---
+en|One thing I love as much as traveling to see my favorite bands, is seeing my friends/mutuals travel to see their favorite bands. 🥰
+en|RT @calumstruly: ashton: the truth luke: https://t.co/XbFOKBPd6B
+en|Best me to JA!
+ko|RT @BTSW_official: [#BTSWORLD_OST] "다시 널 찾을거야, 운명처럼💜" 드디어! #방탄소년단 이 열심히 부른 BTS WORLD OST 타이틀곡! &lt;Heartbeat&gt;가 나왔습니다! (👏🏻) 매니저님을 위한 특별한 선물…
+ja|いやwwww逆に運良すぎかwwww三枚目wwww https://t.co/7WgmYTrFWu
+en|RT @kookpics: cr. _FE_JK0901 - #JUNGKOOK #정국 @BTS_twt https://t.co/gFOMHUN5f2
+en|RT @ughhhsierra: it’s been a couple months since i’ve felt like i’m home
+tr|@gulsumm_c Of ne güzel hava attın esti buralar  skkdkd
+ar|RT @nj1la: ضيفني+لآيكك+رتويت+سوي فولو من الرتويت واللآيكات. وآضمن لك آكثر من ٥٠٠ متابع في ساعة. يلا ضيفوا بعض. وتابعوني.🖤🖤 July 01, 2019 at…
+und|RT @carluxokuster: https://t.co/7W3k6FrFK4
+ar|RT @Jurgen3ziz: كانت مُجرد نظرة إلى الأرض لمُدة 17 ثانية ..كانت مُجرد درس قصير تم فهمه في ثواني ..كانت مُجرد تساؤل: إلى أين سنصل ياتُرى ؟…
+es|Soñé que conocía a Tom Holland y me daba un besito y ahora estoy triste porque no pasó
+tr|ölüşüm ama sanki böyle ölmemişim gibiyim
+ja|【絶対1位】高橋あゆみのどんどん動画 現正廣播中！！https://t.co/xOic40JFch
+th|@MESa131_ ขนาดเดินวนรอบเขาแล้วเรียกฟุคุซาวะซัง ฟุคุซาวะซังงงงง
+ja|RT @BLUESOLVALOU: 『父にサビを歌われて剣を抜く娘』の詳細を調べてたら日が暮れたでござるの巻 https://t.co/azYUKq2BTx
+pt|@theskindoctor13 @ANI @humasqureshi Huma mam real life Mai Laila vaale gunde yahi h
+ja|RT @katsuse_m: 梅雨の雰囲気ばかりなタイムラインに、花火してるギャルのツイートが流れてきた。自分の知らないところで夏が始まってた。その次のツイートで知らないOLが「彼氏と別れた」とフォロワーに報告してた。いいねで回ってきてた。ちっともよくなさそうだった。自分の知ら…
+ja|RT @aikanium: 祇園のカラーコーンの隠し方が私は好きで。カラーコーンなんてあったら確実にvisual pollutionになるのに、これだと逆にあった方がアクセントになってかわいいかも？と思えるくらいの見た目。そこまで持っていけるのすごい。 https://t.co…
+in|RT @YourAverageOta3: Banger✊ https://t.co/eyJptcI31z
+
+To filter out only spanish tweets, we can use the `filter` method.
+```python
+espanol = tweets.filter(df['lang'] == 'es')
+espanol.show(10, truncate=False)
+```
+lang|text
+---|---
+es|Soñé que conocía a Tom Holland y me daba un besito y ahora estoy triste porque no pasó
+es|@Sus1216 @Kaykas90 @NetflixES Graciassss
+es|Que va xd
+es|RT @pixelatedboat: Primary debate https://t.co/soyz8tiUft
+es|RT @elcapitansur: @BMarmoldeLeon También Se mata con diálogos que le dan tiempo a la tiranía de seguir subyugando al venezolano, se mata co…
+es|RT @hernanflash: @matiaseperezz Nada del otro mundo como para no superarlo 🤷‍♂️
+es|@adnradiochile @SandraZeballos #EclipseSolar #CiudadanoADN #EclipseCiudadano #Radionautas Este dato de Radio Futur… https://t.co/z2EXUNNGKC
+es|@INFOnews La prepaga es más cara que un alquiler si sigue así tendremos que evaluar si no conviene ir a vivir https://t.co/fb8hHAtVa4
+es|@Pykare La verdas calles y plazas en casi todo el país estan un desastre no da ni para sentarte a tomat terere, los… https://t.co/uzEWM8sy2R
+es|RT @dherranzba: Me traigo un gran proyecto competitivo entre manos, gracias a uno de los clubes competitivos más importantes en España. Es…
+
+We can see that there was one language misclassification of a tweet in the fourth row. This should have been classified as English.
