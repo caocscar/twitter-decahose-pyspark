@@ -1,6 +1,6 @@
 # Using Twitter Decahose with Cavium <!-- omit in toc -->
 
-Go directly to Jupyter Notebook viewer version (with sample output)
+Go directly to Jupyter Notebook viewer version (with sample output). Not up-to-date as the markdown document, though.
  https://nbviewer.jupyter.org/github/caocscar/twitter-decahose-pyspark/blob/master/twitterCavium.ipynb
 
 ## Table of Contents <!-- omit in toc -->
