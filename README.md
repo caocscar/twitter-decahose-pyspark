@@ -469,30 +469,31 @@ From the [Twitter documentation about language](https://developer.twitter.com/en
 Let's look at the distribution of languages.
 ```python
 languages = df.groupBy('lang').count().orderBy('count', ascending=False)
-languages.show(20)
+languages = languages.withColumn('pct', f.format_number(f.lit(100) * f.col('count') / f.sum('count').over(Window.partitionBy()),1))
+languages.orderBy('count', ascending=False).show(20)
 ```                                                            
-language|lang|count|
----|:---:|---:|
-English|en|10858344|
-Japanese|ja|6475431|
-Spanish|es|2828876|
-undefined|und|2495456|
-Portuguese|pt|2356523|
-Arabic|ar|1994858|
-Thai|th|1639563|
-Korean|ko|1505357|
-Indonesian|in|987514|
-French|fr|765138|
-Turkish|tr|685058|
-Tagalog|tl|521548|
-Italian|it|198574|
-Russian|ru|193590|
-Hindi|hi|167066|
-German|de|142481|
-Urdu|ur|104673|
-Persian|fa|96038|
-Polish|pl|93276|
-Dutch|nl|78095|
+language|lang|count|pct
+---|:---:|---:|---:
+English|en|10858344|31.2
+Japanese|ja|6475431|18.6
+Spanish|es|2828876|8.1
+undefined|und|2495456|7.2
+Portuguese|pt|2356523|6.8
+Arabic|ar|1994858|5.7
+Thai|th|1639563|4.7
+Korean|ko|1505357|4.3
+Indonesian|in|987514|2.8
+French|fr|765138|2.2
+Turkish|tr|685058|2.0
+Tagalog|tl|521548|1.5
+Italian|it|198574|0.6
+Russian|ru|193590|0.6
+Hindi|hi|167066|0.5
+German|de|142481|0.4
+Urdu|ur|104673|0.3
+Persian|fa|96038|0.3
+Polish|pl|93276|0.3
+Dutch|nl|78095|0.2
 
 **Note**: I've tacked on the `language` column for clarification.
 
